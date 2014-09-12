@@ -1,0 +1,43 @@
+<div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?=$this->__('<a href="http://productify.com/" target="_blank"><strong>Productify.com</strong></a> Extension - This module makes it easy to import products from <a href="http://productify.com/" target="_blank"><strong>Productify.com</strong></a>.')?></h3></td>
+        </tr>
+    </table>
+</div>
+<div class="entry-edit">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend">Upload URL to XML</h4>
+        <div class="form-buttons"></div>
+    </div>
+
+    <div class="fieldset fieldset-wide" id="group_4fieldset_group_4">
+
+        <form id="link_form" name="edit_form" action="<?php echo $this->getUrl('*/adminhtml_select')?>" method="post">
+            <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"  />
+
+            <h1>Start here</h1>
+            <ul>
+                <li>
+                    <input type="url" name="xml_url" class="input-text required-entry" placeholder="Feed URL:" size="100" />
+                    <br/>
+                    <br/>
+                    (Enter valid productify.com feed URL here. If you're not sure read here <a href="http://productify.com/" target="_blank">Productify</a> )
+                    <br/>
+                    <br/>
+                </li>
+                <li>
+                    <button type="submit" name="start" class="save scalable button">
+                        <span>Start</span>
+                    </button>
+                </li>
+            </ul>
+
+        </form>
+    </div>
+
+</div>
+<script type="text/javascript">
+    var editForm = new varienForm('link_form');
+</script>

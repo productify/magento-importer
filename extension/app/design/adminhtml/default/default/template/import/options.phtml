@@ -1,0 +1,62 @@
+<div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?=$this->__('<a href="http://productify.com/" target="_blank"><strong>Productify.com</strong></a> Extension - This module makes it easy to import products from <a href="http://productify.com/" target="_blank"><strong>Productify.com</strong></a>.')?></h3></td>
+<!---->
+<!--            <td class="a-right">-->
+<!--                <button onclick="history.go(-1);" class="scalable" type="button"><span>Back</span></button>-->
+<!--            </td>-->
+        </tr>
+    </table>
+</div>
+<div class="entry-edit" id="step1">
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend">Import Options</h4>
+        <div class="form-buttons"></div>
+    </div>
+
+    You've selected:<br/>
+    <?php echo $this->getProductNum(); ?> Product(s) (with <?php echo $this->getSkuNum(); ?> SKUs) <br/><br/>
+
+    <div class="fieldset fieldset-wide" id="group_4fieldset_group_4">
+
+        <form id="options_form" name="edit_form" action="<?php echo $this->getUrl('*/adminhtml_myform/post')?>" method="post">
+            <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"  />
+            Other options
+            <ul>
+                <li>
+                    <input type="checkbox" name="images" class="checkbox" id="images"/>
+                    <label for="images"> Import product images?</label>
+                </li>
+                <li>
+                    <input type="checkbox" name="active" class="checkbox" id="active"/>
+                    <label for="active"> Make all imported products active?</label>
+                </li>
+                <li>
+                    <button type="submit" class="button scalable save" onclick="show_div()">
+                        <span>Continue</span>
+                    </button>
+                </li>
+            </ul>
+        </form>
+    </div>
+</div>
+
+<div class="entry-edit" id="step2" style="display: none">
+    <h1>Processing</h1>
+    It might take several minutes. Please don't close your browser window until you get to Success Page.<br/>
+    Once done, you'll be automatically redirected to success page!
+</div>
+
+<script>
+    function show_div()
+    {
+        document.getElementById('step2').style.display = 'block';
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById("take4").className = "tab-item-link active";
+        document.getElementById("take3").className = "tab-item-link";
+    }
+</script>
+<script type="text/javascript">
+    var editForm = new varienForm('options_form');
+</script>

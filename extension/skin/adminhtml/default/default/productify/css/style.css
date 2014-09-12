@@ -1,0 +1,29 @@
+
+    #testTable { 
+      width : 350px;
+      margin-left: auto; 
+      margin-right: auto; 
+    }
+    
+    #tablePagination { 
+      
+    }
+    
+    #tablePagination_paginater { 
+      margin-left: auto; 
+      margin-right: auto;
+    }
+    
+    #tablePagination img { 
+      padding: 0px 2px; 
+    }
+    
+    #tablePagination_perPage { 
+      float: left; 
+      display: none;
+    }
+    
+    #tablePagination_paginater { 
+      float: right; 
+    }
+    

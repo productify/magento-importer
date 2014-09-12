@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<layout>
+    <import_adminhtml_myform_index>
+        <update handle="import_myform_index"/>
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Productify import products</title></action>
+        </reference>
+        <reference name="content">
+            <block type="import/myform" name="myform" template="import/myform.phtml"/>
+        </reference>
+    </import_adminhtml_myform_index>
+    <import_adminhtml_link_index>
+        <update handle="import_myform_index"/>
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Productify Add link</title></action>
+        </reference>
+        <reference name="content">
+            <block type="import/myform" name="link" template="import/addlink.phtml"/>
+        </reference>
+    </import_adminhtml_link_index>
+    <import_adminhtml_select_index>
+        <update handle="import_myform_index"/>
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Productify Select Products</title></action>
+        </reference>
+        <reference name="content">
+            <block type="import/myform" name="select" template="import/select.phtml"/>
+        </reference>
+    </import_adminhtml_select_index>
+    <import_adminhtml_options_index>
+        <update handle="import_options_index"/>
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Productify Select Products</title></action>
+        </reference>
+        <reference name="content">
+            <block type="import/options" name="options" template="import/options.phtml"/>
+        </reference>
+    </import_adminhtml_options_index>
+</layout>

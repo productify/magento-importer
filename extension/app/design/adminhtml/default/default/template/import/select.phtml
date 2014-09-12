@@ -1,0 +1,384 @@
+<link rel="stylesheet" type="text/css"
+      href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN); ?>adminhtml/default/default/productify/css/style.css">
+<script type="text/javascript"
+        src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN); ?>adminhtml/default/default/productify/jquery.js"></script>
+<script type="text/javascript"
+        src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN); ?>adminhtml/default/default/productify/jquery.tablePagination.0.5.js"></script>
+<!--<style>
+    #tablePagination_paginater
+    {
+        display: none;
+    }
+</style>
+-->
+<div class="content-header">
+    <h3><?= $this->__('<a href="http://productify.com/" target="_blank"><strong>Productify.com</strong></a> Extension - This module makes it easy to import products from <a href="http://productify.com/" target="_blank"><strong>Productify.com</strong></a>.') ?></h3>
+</div>
+
+<?php
+
+if ($_POST['xml_url'])
+    $url = $_POST['xml_url'];
+else
+    $url = Mage::getSingleton('core/session')->getLink();
+
+Mage::getSingleton('core/session')->setLink($url);
+
+$xml = simplexml_load_file($url);
+if (!$xml) {
+    $argument = Mage::getSingleton('core/session')->addError('The feed URL entered is incorrect. Feed not found or invalid format.');
+    $backurl = Mage::getSingleton('core/session')->getBackUrl();
+    Mage::app()->getFrontController()->getResponse()->setRedirect($backurl);
+    ?>
+<?php
+} else {
+    ?>
+    <div class="grid">
+    <div class="hor-scroll">
+    <div class="entry-edit" id="step1">
+
+    <!--<div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend">Select products</h4>
+        <div class="form-buttons"></div>
+    </div>-->
+
+    <div class="fieldset-wide" id="group_4fieldset_group_4">
+
+    <input type="hidden" class="getpage" value="<?php if (isset($_GET['page'])) {
+        echo $_GET['page'];
+    } ?>"/>
+
+    <form id="edit_form" name="edit_form" action="<?php echo $this->getUrl('*/adminhtml_myform/post') ?>"
+          method="post">
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
+
+
+        <div id="sel_table">
+            <?php
+            if (isset($_POST['start']) || Mage::getSingleton('core/session')->getLink()) {
+                @session_start();
+
+                $_SESSION['url'] = $url;
+                //$skus = array_unique($_POST['product']);
+
+                foreach ($xml->products as $product) {
+                    foreach ($product as $product_detail) {
+                        $details[] = $product_detail;
+                    }
+                }
+                $total = count($details);
+
+                ?>
+                <p align="center"><strong>Total Products: </strong><?php echo $total; ?></p>
+                <input type="hidden" name="url" value="<?php echo $url; ?>">
+                <?php
+
+                $sn = 0;
+
+                foreach ($details as $value) {
+                    $product_names[] = (string)$value->product_name;
+                    $skus[] = (string)$value->skus->sku->id;
+
+                    $data = array(
+                        'product_name' => $product_names,
+                        'sku' => $skus
+                    );
+                    //$_SESSION['data']   = $data;
+
+
+                    $pn = $value->skus->sku->id;
+                    if ($sn % $total == 0) {
+                        ?>
+                        <div style="<?php if ($sn == 0) {
+                            echo "display: block;";
+                        } else {
+                            echo "display: none;";
+                        } ?>" >
+                        <table class="table_<?php echo $sn; ?>" border="0" width="100%" cellspacing="0" id="tbl_list">
+                        <colgroup>
+                            <col class="a-center" width="30">
+                            <col class="a-center" width="60">
+                            <col>
+                            <col width="120">
+                            <col width="120">
+                            <col width="120">
+                            <col class="a-center" width="60">
+                            <col width="100">
+                            <col width="100">
+                        </colgroup>
+                        <thead>
+                        <tr class="headings">
+                            <th><span class="nobr">SN</span></th>
+                            <th><span class="nobr"><input type="checkbox" id="check-all"/>Select All</span></th>
+                            <th><span class="nobr">Product Name</span></th>
+                            <th><span class="nobr">Category</span></th>
+                            <th><span class="nobr">Sub Category</span></th>
+                            <th><span class="nobr">Brand</span></th>
+                            <th><span class="nobr"></span></th>
+                            <th><span class="nobr">SKU</span></th>
+                            <th><span class="nobr">Varient</span></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                    <?php
+                    }
+                    ?>
+                    <tr class="<?php if (($sn + 1) % 2 == 1) echo 'odd'; else echo 'even' ?>">
+                        <td class="a-right"><?php echo $sn + 1; ?></td>
+                        <td class="a-center">
+                            <input name="product[]" type="checkbox" value="<?php echo $pn; ?>" class="product"
+                                   id="<?php echo $sn; ?>"/>
+                        </td>
+                        <td><?php echo $value->product_name; ?></td>
+                        <td><?php $part = explode('>', $value->categories->category);
+                            echo $part[0] ?></td>
+                        <td><?php echo $part[1]; ?>
+                        </td>
+                        <td><?php echo $value->brand; ?></td>
+                        <td class="a-center">
+                            <?php
+                            foreach ($value->skus as $sku) {
+                                $num_skus = count($sku);
+                                $j = 1;
+                                foreach ($sku->sku as $sk) {
+                                    $skuid = $sk->id;
+                                    ?>
+                                    <input name="product_sku[]" type="checkbox"
+                                           class="product_sku product_sku_<?php echo $sn; ?>"
+                                           value="<?php echo $skuid; ?>"
+                                           id="product_sku_<?php echo $sn; ?>"/>
+                                    <br/>
+                                    <?php
+                                    $j++;
+                                }
+                            }
+                            ?>
+
+                        </td>
+                        <td>
+                            <?php
+                            foreach ($value->skus as $sku) {
+                                $num_skus = count($sku);
+                                $j = 1;
+                                foreach ($sku->sku as $sk) {
+                                    $skuid = $sk->id;
+                                    ?>
+                                    <span><?php echo $skuid; ?></span><br/>
+                                    <?php
+                                    $j++;
+                                }
+                            }
+                            ?>
+
+                        </td>
+                        <td>
+                            <?php
+                            foreach ($value->skus as $sku) {
+                                $num_skus = count($sku);
+                                $j = 1;
+                                foreach ($sku->sku as $sk) {
+                                    $skuid = $sk->id;
+                                    $va = 1;
+                                    foreach ($sk->variants as $v) {
+                                        $var_num = count($v);
+                                        $var = $v->variant;
+                                        ?>
+                                        <input
+                                            name="product_<?php echo $sn ?>[sku_<?php echo $j; ?>][variant_<?php echo $va; ?>]"
+                                            type="hidden" class="product_<?php echo $sn; ?>"
+                                            value="<?php echo $var; ?>"/>
+                                        <span><?php echo $var; ?></span><br/>
+                                        <?php
+                                        $va++;
+                                    }
+                                    $j++;
+                                }
+                            }
+                            ?>
+
+                        </td>
+                    </tr>
+                    <?php
+                    $sn++;
+                    if ($sn % $total == 0) {
+                        ?>
+                        </tbody>
+                        </table>
+                        </div>
+                    <?php
+                    }
+                }
+            }
+            ?>
+
+            <br/>
+            <button type="button" name="next_submit" id="next-btn" class="save scalable button">
+                <span>Next</span>
+            </button>
+        </div>
+
+        <div id="options" style="display: none">
+            You've selected:<br/>
+            <span class="prods"></span> Product(s) (with <span class="sku"></span> SKUs) <br/><br/>
+            <label for="mail">Email address to receive a notification email once done: <span
+                    class="required">*</span></label>
+            <input type="email" name="mail" class="required-entry input-text" id="mail"/><br/>
+
+            Other options
+            <ul>
+                <li>
+                    <input type="checkbox" name="images" class="checkbox" id="images"/>
+                    <label for="images"> Import product images?</label>
+                </li>
+                <li>
+                    <input type="checkbox" name="active" class="checkbox" id="active"/>
+                    <label for="active"> Make all imported products active?</label>
+                </li>
+                <li>
+                    <button type="button" class="button scalable" onclick="reverse_options()">
+                        <span>Back</span>
+                    </button>
+                    <button type="submit" class="button scalable save" onclick="show_div(event)">
+                        <span>Continue</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </form>
+
+    </div>
+    </div>
+
+    <div class="entry-edit" id="step2" style="display: none">
+        <div class="fieldset fieldset-wide" id="group_4fieldset_group_4">
+            <h1>Processing!</h1>
+            Products are being processed!
+        </div>
+    </div>
+    </div>
+    </div>
+    <script>
+        function show_div(event) {
+
+            function isValidEmailAddress(emailAddress) {
+                var pattern = new RegExp(/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i);
+                return pattern.test(emailAddress);
+            };
+
+            if (document.getElementById("mail").value == '' || !isValidEmailAddress(document.getElementById("mail").value)) {
+                alert('Please enter a valid email address.');
+                event.preventDefault();
+            }
+
+            else {
+                document.getElementById('step2').style.display = 'block';
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById("take4").className = "tab-item-link active";
+                document.getElementById("take3").className = "tab-item-link";
+            }
+        }
+
+        function reverse_options() {
+            document.getElementById('options').style.display = 'none';
+            document.getElementById('sel_table').style.display = 'block';
+            document.getElementById("take3").className = "tab-item-link";
+            document.getElementById("take2").className = "tab-item-link active";
+        }
+
+        function show_options() {
+            document.getElementById('options').style.display = 'block';
+            document.getElementById('sel_table').style.display = 'none';
+            document.getElementById("take3").className = "tab-item-link active";
+            document.getElementById("take2").className = "tab-item-link";
+        }
+
+
+    </script>
+
+    <script type="text/javascript">
+        var editForm = new varienForm('edit_form');
+    </script>
+
+    <script type="text/javascript">
+        var $j = jQuery.noConflict();
+        $j(document).ready(function () {
+            // checkall and uncheckall
+            $j('#check-all').click(function (event) {
+                if (this.checked) {
+                    $j('.product').each(function () {
+                        this.checked = true;
+                    });
+                    $j('.product_sku').each(function () {
+                        this.checked = true;
+                    });
+
+                } else {
+                    $j('.product').each(function () {
+                        this.checked = false;
+                    });
+                    $j('.product_sku').each(function () {
+                        this.checked = false;
+                    });
+                }
+            });
+
+            // for particular item selected only
+            $j('.product').click(function (event) {
+                var id = $j(this).attr('id');
+                if (this.checked) {
+                    $j('.product_sku_' + id).each(function () {
+                        this.checked = true;
+                    });
+                } else {
+                    $j('.product_sku_' + id).each(function () {
+                        this.checked = false;
+                    });
+                }
+            });
+
+            //for sku selection invoking corresponding product selection
+            $j('.product_sku').click(function (event) {
+
+                var thestringid = $j(this).attr('id');
+                var this_class = $j(this).attr('class').split(' ')[1]
+                var id = thestringid.replace(/^\D+/g, '');
+                if (this.checked) {
+                    $j('#' + id).each(function () {
+                        this.checked = true;
+                    });
+                } else {
+                    if ($j('input:checkbox.' + this_class + ':checked').size() == 0) {
+                        $j('#' + id).each(function () {
+                            this.checked = false;
+                        });
+                    }
+                }
+            });
+
+
+        });
+
+        // table pagination
+        $j('table').tablePagination({});
+
+        $j(document).ready(function () {
+
+            $j('#next-btn').click(function (e) {
+                if (!$j('.product:checked').length > 0) {
+                    e.preventDefault();
+                    alert('Please select at least one product.');
+                }
+                else {
+                    var prods = $j('.product:checked').length;
+                    var sku = $j('.product_sku:checked').length;
+                    $j('.sku').html(sku);
+                    $j('.prods').html(prods);
+                    show_options();
+                }
+            });
+        });
+
+    </script>
+<?php
+}
+?>
